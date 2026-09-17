@@ -73,8 +73,15 @@ function HomeIcon() {
 function OpeningHero() {
   return (
     <section className="hero-section" id="top">
-      <div className="hero-stage" aria-label="Mechmark homepage opening product visual">
-        <img src={hero.image} alt="Mechmark multi purpose dryer with food products" />
+      <div className="hero-stage hero-placeholder" aria-label="Mechmark opening animation placeholder">
+        <div className="placeholder-frame">
+          <span>Opening animation</span>
+          <h1>Animation coming soon</h1>
+          <p>
+            This space is reserved for the custom product opening animation. A static placeholder is
+            shown until the animation asset is ready.
+          </p>
+        </div>
       </div>
     </section>
   );
