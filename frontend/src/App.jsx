@@ -1,61 +1,170 @@
-import { useEffect, useState } from "react";
-import { brochures, featureImage, hero, productFamilies, services, stats, teamMembers } from "./content.js";
+import { useEffect, useRef, useState } from "react";
+import {
+  about,
+  brochures,
+  company,
+  featured,
+  hero,
+  productFamilies,
+  services,
+  stats,
+  teamMembers
+} from "./content.js";
 import mechmarkLogo from "../../assets/images/mechmark-logo.png";
 
 const productIcons = {
+  dryer: (
+    <svg viewBox="0 0 220 130" role="img" aria-hidden="true">
+      <path d="M40 112h140" className="icon-base" />
+      <path d="M62 14h96v92H62z" />
+      <path d="M110 14v92" className="icon-detail" />
+      <path d="M72 32h28M72 50h28M72 68h28M72 86h28M120 32h28M120 50h28M120 68h28M120 86h28" className="icon-detail" />
+      <path d="M70 106v10M150 106v10" />
+      <path d="M158 30h14v24h-14" />
+      <circle cx="165" cy="42" r="3" className="icon-accent" />
+    </svg>
+  ),
   copraCutter: (
-    <svg viewBox="0 0 180 110" role="img" aria-hidden="true">
-      <path d="M40 26h79l11 18v18H55L40 45z" />
-      <path d="M57 62h74v23H57zM70 85v18M118 85v18" />
-      <path d="M82 44h31M78 54h42M132 53h18v22h-18" />
-      <circle cx="118" cy="72" r="9" />
-      <path d="M57 63l-15 20M39 33v52M34 103h44M106 103h43" />
+    <svg viewBox="0 0 220 130" role="img" aria-hidden="true">
+      <path d="M38 92h148" className="icon-base" />
+      <path d="M58 42h96l14 20v28H72L58 66z" />
+      <path d="M72 90v22M148 90v22M55 112h42M132 112h48" />
+      <path d="M72 42l-18 22v34" />
+      <path d="M92 58h44M88 70h56" className="icon-detail" />
+      <path d="M168 64h24v24h-24z" />
+      <circle cx="144" cy="80" r="10" className="icon-accent" />
+      <path d="M56 88l-20 14" className="icon-detail" />
     </svg>
   ),
   oilPress: (
-    <svg viewBox="0 0 180 110" role="img" aria-hidden="true">
-      <path d="M53 18h64l-13 28H67z" />
-      <path d="M43 46h73v43H43zM116 48h30v41h-30z" />
-      <path d="M48 60H24l-8 9h32M54 58h45M54 70h45M54 82h45" />
-      <path d="M126 59h10M126 70h10M126 81h10" />
-      <path d="M61 89v12M135 89v12" />
+    <svg viewBox="0 0 220 130" role="img" aria-hidden="true">
+      <path d="M34 94h154" className="icon-base" />
+      <path d="M78 28h72l-15 34H93z" />
+      <path d="M58 62h92v42H58z" />
+      <path d="M150 66h40v38h-40z" />
+      <path d="M58 74H31l-13 12h40" />
+      <path d="M75 76h55M75 88h55" className="icon-detail" />
+      <path d="M164 76h13M164 88h13" className="icon-detail" />
+      <circle cx="176" cy="100" r="5" className="icon-accent" />
+      <path d="M72 104v14M174 104v14" />
     </svg>
   ),
   filterPress: (
-    <svg viewBox="0 0 180 110" role="img" aria-hidden="true">
-      <path d="M24 58h132M33 44v45M146 44v45M47 89h86" />
-      <path d="M57 35h66M57 45h66M57 55h66" />
-      <path d="M68 29v42M78 29v42M88 29v42M98 29v42M108 29v42M118 29v42" />
-      <path d="M28 35a18 18 0 1 0 0 36M28 44h-12M28 62h-12" />
-      <path d="M40 89l-18 14M138 89l18 14M43 76h91l10 13H33z" />
+    <svg viewBox="0 0 220 130" role="img" aria-hidden="true">
+      <path d="M32 94h156" className="icon-base" />
+      <path d="M50 50v52M174 50v52M62 102h100" />
+      <path d="M74 38v48M86 38v48M98 38v48M110 38v48M122 38v48M134 38v48M146 38v48" />
+      <path d="M70 44h82M70 86h82" className="icon-detail" />
+      <circle cx="42" cy="70" r="20" />
+      <path d="M42 50v40M22 70h40" className="icon-accent" />
+      <path d="M62 94l-24 24M162 94l24 24" className="icon-detail" />
     </svg>
   ),
   storageTank: (
-    <svg viewBox="0 0 180 110" role="img" aria-hidden="true">
-      <path d="M58 16h64l6 9v45l-20 22H72L52 70V25z" />
-      <path d="M66 29h48M66 43h48M66 57h48" />
-      <path d="M126 37h18M126 53h18M144 35v8M144 51v8" />
-      <path d="M52 37H36M52 53H36M36 35v8M36 51v8" />
-      <path d="M75 92v12M105 92v12M58 104h64M88 92v12" />
+    <svg viewBox="0 0 220 130" role="img" aria-hidden="true">
+      <path d="M72 22h76l12 14v58l-24 24H84L60 94V36z" />
+      <path d="M84 42h52M84 58h52M84 74h52" className="icon-detail" />
+      <path d="M160 52h24M160 76h24M184 48v10M184 72v10" />
+      <path d="M60 52H36M60 76H36M36 48v10M36 72v10" />
+      <path d="M90 118v8M130 118v8M76 126h68" className="icon-base" />
+      <path d="M110 22v-12M94 10h32" className="icon-accent" />
     </svg>
   )
 };
 
+/* Neutral stand-in for any image that hasn't been supplied yet. */
+function MediaPlaceholder({ label = "Image coming soon", className = "" }) {
+  return (
+    <div className={`media-placeholder ${className}`} role="img" aria-label={label}>
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <rect x="6" y="10" width="36" height="28" rx="2" />
+        <circle cx="17" cy="20" r="3.5" />
+        <path d="M6 33l11-10 8 7 6-5 11 9" />
+      </svg>
+      <span>{label}</span>
+    </div>
+  );
+}
+
+const navItems = [
+  ["#products", "Products"],
+  ["#about", "About"],
+  ["#catalogues", "Catalogues"],
+  ["#services", "Parts & Service"],
+  ["#contact", "Contact"]
+];
+
 function Header() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const onKey = (event) => event.key === "Escape" && setMenuOpen(false);
+    const onResize = () => window.innerWidth > 900 && setMenuOpen(false);
+    document.body.classList.add("menu-open");
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("resize", onResize);
+    return () => {
+      document.body.classList.remove("menu-open");
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [menuOpen]);
+
+  const close = () => setMenuOpen(false);
+
   return (
     <header className="site-header">
-      <a className="brand" href="#top" aria-label="Mechmark home">
+      <a className="brand" href="#top" aria-label="Mechmark home" onClick={close}>
         <img src={mechmarkLogo} alt="Mechmark" />
       </a>
       <nav className="nav-links" aria-label="Primary navigation">
-        <a href="#products">Products</a>
-        <a href="#capabilities">Capabilities</a>
-        <a href="#catalogues">Catalogues</a>
-        <a href="#contact">Contact</a>
+        {navItems.map(([href, label]) => (
+          <a href={href} key={href}>
+            {label}
+          </a>
+        ))}
       </nav>
-      <a className="header-cta" href="https://wa.me/919496801821">
-        WhatsApp
-      </a>
+      <div className="header-actions">
+        <a className="header-call" href={`tel:${company.phones[0].tel}`}>
+          Call {company.phones[0].label}
+        </a>
+        <a className="header-cta" href={company.whatsapp}>
+          WhatsApp
+        </a>
+        <button
+          type="button"
+          className={`menu-toggle${menuOpen ? " is-open" : ""}`}
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
+          aria-controls="mobile-menu"
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+      </div>
+
+      <nav
+        id="mobile-menu"
+        className={`mobile-menu${menuOpen ? " is-open" : ""}`}
+        aria-label="Mobile navigation"
+        aria-hidden={!menuOpen}
+      >
+        {navItems.map(([href, label]) => (
+          <a href={href} key={href} onClick={close} tabIndex={menuOpen ? 0 : -1}>
+            {label}
+          </a>
+        ))}
+        <div className="mobile-menu-contact">
+          {company.phones.map((phone) => (
+            <a href={`tel:${phone.tel}`} key={phone.tel} tabIndex={menuOpen ? 0 : -1}>
+              Call {phone.label}
+            </a>
+          ))}
+        </div>
+      </nav>
     </header>
   );
 }
@@ -73,15 +182,40 @@ function HomeIcon() {
 function OpeningHero() {
   return (
     <section className="hero-section" id="top">
-      <div className="hero-stage hero-placeholder" aria-label="Mechmark opening animation placeholder">
-        <div className="placeholder-frame">
+      {/* Animation slot: replace .hero-stage contents with the opening animation when ready. */}
+      <div className="hero-stage" aria-label="Opening animation placeholder">
+        <div className="hero-placeholder-label">
           <span>Opening animation</span>
-          <h1>Animation coming soon</h1>
-          <p>
-            This space is reserved for the custom product opening animation. A static placeholder is
-            shown until the animation asset is ready.
-          </p>
+          <strong>Coming soon</strong>
+          <p>The final animation will appear here.</p>
         </div>
+      </div>
+      <div className="hero-intro">
+        <h1>{hero.title}</h1>
+        <p>{hero.text}</p>
+        <div className="hero-actions">
+          {hero.quickLinks.map((link) => (
+            <a className="btn btn-primary" href={link.href} key={link.label}>
+              {link.label}
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FeaturedStory() {
+  return (
+    <section className="section split-feature">
+      <MediaPlaceholder className="feature-media" label="Article image coming soon" />
+      <div className="split-feature-copy">
+        <p className="eyebrow">{featured.eyebrow}</p>
+        <h2>{featured.title}</h2>
+        <p>{featured.text}</p>
+        <a className="btn btn-primary" href={featured.href} target="_blank" rel="noreferrer">
+          {featured.cta}
+        </a>
       </div>
     </section>
   );
@@ -90,13 +224,10 @@ function OpeningHero() {
 function ProductGrid() {
   return (
     <section className="section" id="products">
-      <div className="section-heading">
-        <p className="eyebrow">Select your product</p>
-        <h2>Choose a Mechmark machine category.</h2>
-      </div>
+      <h2 className="section-title">Select your product</h2>
       <div className="product-icon-grid">
         {productFamilies.map((product) => (
-          <a className="product-icon-card" href={product.href} key={product.title}>
+          <a className="product-icon-card" href={`#${product.slug}`} key={product.slug}>
             {productIcons[product.icon]}
             <span>{product.title}</span>
           </a>
@@ -123,16 +254,26 @@ function ProductDetail({ product }) {
         <div className="product-detail-copy">
           <p className="eyebrow">{product.code}</p>
           <h1>{product.title}</h1>
-          <p>{product.detail}</p>
-          <p>{product.summary}</p>
+          {product.detail || product.summary ? (
+            <>
+              {product.detail && <p>{product.detail}</p>}
+              {product.summary && <p>{product.summary}</p>}
+            </>
+          ) : (
+            <p className="muted-note">Product details coming soon.</p>
+          )}
         </div>
         <div className="product-detail-image">
-          <img src={product.image} alt={product.title} />
+          {product.image ? (
+            <img src={product.image} alt={product.title} />
+          ) : (
+            <MediaPlaceholder label="Product image coming soon" />
+          )}
         </div>
       </div>
 
       <div className="product-detail-specs" aria-label={`${product.title} highlights`}>
-        {product.features.map((feature) => (
+        {(product.features?.length ? product.features : ["Specifications coming soon"]).map((feature) => (
           <span key={feature}>{feature}</span>
         ))}
         <div className="product-detail-actions">
@@ -144,19 +285,57 @@ function ProductDetail({ product }) {
   );
 }
 
+function AboutBlock() {
+  return (
+    <section className="section split-feature split-feature-reverse" id="about">
+      <div className="split-feature-copy">
+        <p className="eyebrow">{about.eyebrow}</p>
+        <h2>{about.title}</h2>
+        {about.paragraphs.map((text) => (
+          <p key={text.slice(0, 24)}>{text}</p>
+        ))}
+        <a className="btn btn-primary" href={about.cta.href}>
+          {about.cta.label}
+        </a>
+      </div>
+      <MediaPlaceholder className="feature-media" label="Factory image coming soon" />
+    </section>
+  );
+}
+
+function StatsStrip() {
+  return (
+    <section className="stats-strip" aria-label="Mechmark in numbers">
+      {stats.map(([value, label]) => (
+        <div className="stat" key={label}>
+          <strong>{value}</strong>
+          <span>{label}</span>
+        </div>
+      ))}
+    </section>
+  );
+}
+
+function initials(name) {
+  return name
+    .replace(/\./g, "")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+}
+
 function TeamSection() {
   return (
-    <section className="team-section" id="team">
-      <div className="team-heading">
-        <p>Our team</p>
-        <h2>Meet Our Dynamic Mechmark Team</h2>
-        <span>A committed team working tirelessly to deliver exceptional food processing solutions for you.</span>
-      </div>
+    <section className="section" id="team">
+      <h2 className="section-title">Meet the Mechmark team</h2>
       <div className="team-grid">
         {teamMembers.map((member) => (
           <article className="team-card" key={member.name}>
-            <div className="team-photo-ring">
-              <img src={member.image} alt={member.name} />
+            <div className="team-avatar">
+              {member.image ? <img src={member.image} alt={member.name} /> : <span>{initials(member.name)}</span>}
             </div>
             <h3>{member.name}</h3>
             <p>{member.role}</p>
@@ -167,68 +346,75 @@ function TeamSection() {
   );
 }
 
-function CapabilityBand() {
-  return (
-    <section className="capability-band" id="capabilities">
-      <div className="capability-copy">
-        <p className="eyebrow">Better production, cleaner buying journey</p>
-        <h2>Built around products first, then proof, support, and enquiry.</h2>
-        <p>
-          The reference site uses a strong first image, offer blocks, product selection, brand proof,
-          and service support. This redesign keeps that rhythm, but translates it for Mechmark with
-          real machinery, brochure downloads, and enquiry-led conversion.
-        </p>
-      </div>
-      <div className="stats-grid">
-        {stats.map(([value, label]) => (
-          <div className="stat" key={label}>
-            <strong>{value}</strong>
-            <span>{label}</span>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function Catalogues() {
   return (
-    <section className="section split-section" id="catalogues">
-      <div>
-        <p className="eyebrow">Download product catalogues</p>
-        <h2>Keep the buyer close to technical material.</h2>
-        <p>
-          Existing brochures are preserved so prospects can move from homepage discovery to a
-          product PDF without hunting through a heavy menu.
-        </p>
+    <section className="section split-feature" id="catalogues">
+      <div className="split-feature-copy">
+        <p className="eyebrow">Product catalogues</p>
+        <h2>Download our brochures</h2>
+        <p>Full specifications, capacities and model details for each Mechmark machine range.</p>
         <div className="brochure-list">
           {brochures.map(([label, href]) => (
-            <a href={href} key={label}>
+            <a href={href} key={label} target="_blank" rel="noreferrer">
               <span>{label}</span>
-              <strong>PDF</strong>
+              <strong>PDF ↓</strong>
             </a>
           ))}
         </div>
       </div>
-      <img className="feature-image" src={featureImage} alt="Mechmark support and catalogue visual" />
+      <MediaPlaceholder className="feature-media" label="Video coming soon" />
     </section>
   );
 }
 
 function Services() {
+  const trackRef = useRef(null);
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
+
+  const updateEdges = () => {
+    const el = trackRef.current;
+    if (!el) return;
+    setAtStart(el.scrollLeft <= 4);
+    setAtEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 4);
+  };
+
+  useEffect(() => {
+    updateEdges();
+    window.addEventListener("resize", updateEdges);
+    return () => window.removeEventListener("resize", updateEdges);
+  }, []);
+
+  const step = (direction) => {
+    const el = trackRef.current;
+    if (!el) return;
+    const card = el.querySelector(".service-card");
+    const amount = card ? card.getBoundingClientRect().width + 24 : el.clientWidth;
+    el.scrollBy({ left: direction * amount, behavior: "smooth" });
+  };
+
   return (
-    <section className="service-section">
-      <div className="section-heading">
-        <p className="eyebrow">Services and support</p>
-        <h2>Support is a main sales message, not an afterthought.</h2>
-      </div>
-      <div className="service-grid">
-        {services.map((service, index) => (
-          <article key={service}>
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            <h3>{service}</h3>
+    <section className="section" id="services">
+      <h2 className="section-title">Services &amp; Support</h2>
+      <div className="service-track" ref={trackRef} onScroll={updateEdges}>
+        {services.map((service) => (
+          <article className="service-card" key={service.title}>
+            <MediaPlaceholder className="service-media" />
+            <h3>{service.title}</h3>
+            <p>{service.text}</p>
+            <a className="btn btn-primary btn-small" href={service.href}>
+              {service.cta}
+            </a>
           </article>
         ))}
+      </div>
+      <div className="carousel-controls">
+        <button type="button" onClick={() => step(-1)} disabled={atStart}>
+          ← Previous
+        </button>
+        <button type="button" onClick={() => step(1)} disabled={atEnd}>
+          Next →
+        </button>
       </div>
     </section>
   );
@@ -238,13 +424,18 @@ function Contact() {
   return (
     <section className="contact-section" id="contact">
       <div>
-        <p className="eyebrow">Talk to Mechmark</p>
-        <h2>Send a machine enquiry.</h2>
-        <p>Nagalikavu, Omassery, Calicut, Kerala - 673582</p>
-        <p>
-          <a href="mailto:mechmarks3@gmail.com">mechmarks3@gmail.com</a>
-          <br />
-          <a href="tel:+919496801821">+91 9496 801 821</a>
+        <p className="eyebrow">Contact</p>
+        <h2>Get in touch with Mechmark</h2>
+        <p>For enquiries, partnerships or support, reach out to us. We are here to help with all your food processing machinery needs.</p>
+        <p>{company.address}</p>
+        <p className="contact-lines">
+          {company.phones.map((phone) => (
+            <a href={`tel:${phone.tel}`} key={phone.tel}>
+              {phone.label}
+              {phone.note ? ` (${phone.note})` : ""}
+            </a>
+          ))}
+          <a href={`mailto:${company.email}`}>{company.email}</a>
         </p>
       </div>
       <form className="enquiry-form">
@@ -256,13 +447,72 @@ function Contact() {
             Product interest
           </option>
           {productFamilies.map((product) => (
-            <option key={product.title}>{product.title}</option>
+            <option key={product.slug}>{product.title}</option>
           ))}
         </select>
         <textarea name="message" placeholder="Requirement" rows="4" />
         <button type="button">Submit enquiry</button>
       </form>
     </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="site-footer">
+      <div className="footer-columns">
+        <div>
+          <h4>Products</h4>
+          {productFamilies.map((product) => (
+            <a href={`#${product.slug}`} key={product.slug}>
+              {product.title}
+            </a>
+          ))}
+        </div>
+        <div>
+          <h4>Parts &amp; Service</h4>
+          <a href="#services">Installation &amp; support</a>
+          <a href="#services">Genuine spare parts</a>
+          <a href="#services">Pan-India service</a>
+        </div>
+        <div>
+          <h4>Catalogues</h4>
+          {brochures.map(([label, href]) => (
+            <a href={href} key={label} target="_blank" rel="noreferrer">
+              {label}
+            </a>
+          ))}
+        </div>
+        <div>
+          <h4>Company</h4>
+          <a href="#about">About us</a>
+          <a href="#team">Our team</a>
+          <a href="#contact">Contact us</a>
+          <a href={company.whatsapp}>WhatsApp</a>
+        </div>
+        <div className="footer-contact">
+          <h4>Contact</h4>
+          <p>{company.address}</p>
+          {company.phones.map((phone) => (
+            <a href={`tel:${phone.tel}`} key={phone.tel}>
+              {phone.label}
+            </a>
+          ))}
+          <a href={`mailto:${company.email}`}>{company.email}</a>
+        </div>
+      </div>
+      <div className="footer-social">
+        <a href={company.social.facebook} target="_blank" rel="noreferrer">Facebook</a>
+        <a href={company.social.instagram} target="_blank" rel="noreferrer">Instagram</a>
+        <strong>Call us: {company.phones[0].label}</strong>
+      </div>
+      <div className="footer-bottom">
+        <a className="brand brand-small" href="#top" aria-label="Mechmark home">
+          <img src={mechmarkLogo} alt="Mechmark" />
+        </a>
+        <span>© {new Date().getFullYear()} {company.name}. All rights reserved.</span>
+      </div>
+    </footer>
   );
 }
 
@@ -275,11 +525,7 @@ export default function App() {
   const [selectedProduct, setSelectedProduct] = useState(getSelectedProduct);
 
   useEffect(() => {
-    const handleHashChange = () => {
-      const nextProduct = getSelectedProduct();
-      setSelectedProduct(nextProduct);
-    };
-
+    const handleHashChange = () => setSelectedProduct(getSelectedProduct());
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
@@ -287,6 +533,11 @@ export default function App() {
   useEffect(() => {
     if (selectedProduct) {
       window.scrollTo({ top: 0, behavior: "auto" });
+    } else {
+      // Returning from a product page to a homepage anchor: scroll to that section.
+      const id = window.location.hash.replace("#", "");
+      const target = id && document.getElementById(id);
+      if (target) target.scrollIntoView();
     }
   }, [selectedProduct]);
 
@@ -299,19 +550,18 @@ export default function App() {
         ) : (
           <>
             <OpeningHero />
+            <FeaturedStory />
             <ProductGrid />
-            <TeamSection />
-            <CapabilityBand />
-            <Catalogues />
+            <AboutBlock />
+            <StatsStrip />
             <Services />
+            <Catalogues />
+            <TeamSection />
             <Contact />
           </>
         )}
       </main>
-      <footer className="site-footer">
-        <strong>Mechmark Industries</strong>
-        <span>React + Django redesign draft</span>
-      </footer>
+      <Footer />
     </>
   );
 }
