@@ -1,15 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  about,
-  brochures,
-  company,
-  featured,
-  hero,
-  productFamilies,
-  services,
-  stats,
-  teamMembers
-} from "./content.js";
+import { ContentProvider, submitEnquiry, useContent } from "./siteContent.jsx";
 import mechmarkLogo from "../../assets/images/mechmark-logo.png";
 
 const productIcons = {
@@ -72,6 +62,17 @@ const productIcons = {
   )
 };
 
+const genericIcon = (
+  <svg viewBox="0 0 220 130" role="img" aria-hidden="true">
+    <path d="M36 104h148" className="icon-base" />
+    <path d="M56 40h108v58H56z" />
+    <path d="M72 56h40M72 70h40M72 84h40" className="icon-detail" />
+    <circle cx="140" cy="70" r="14" />
+    <circle cx="140" cy="70" r="4" className="icon-accent" />
+    <path d="M70 98v14M150 98v14" />
+  </svg>
+);
+
 /* Neutral stand-in for any image that hasn't been supplied yet. */
 function MediaPlaceholder({ label = "Image coming soon", className = "" }) {
   return (
@@ -86,6 +87,16 @@ function MediaPlaceholder({ label = "Image coming soon", className = "" }) {
   );
 }
 
+/* Shows the uploaded image, or the placeholder when there isn't one yet. */
+function Media({ src, alt, label, className = "" }) {
+  if (!src) return <MediaPlaceholder className={className} label={label} />;
+  return <img className={`media-image ${className}`} src={src} alt={alt} loading="lazy" />;
+}
+
+function isExternal(href) {
+  return /^https?:\/\//.test(href || "");
+}
+
 const navItems = [
   ["#products", "Products"],
   ["#about", "About"],
@@ -95,7 +106,9 @@ const navItems = [
 ];
 
 function Header() {
+  const { company } = useContent();
   const [menuOpen, setMenuOpen] = useState(false);
+  const mainPhone = company.phones[0];
 
   useEffect(() => {
     if (!menuOpen) return undefined;
@@ -114,38 +127,45 @@ function Header() {
   const close = () => setMenuOpen(false);
 
   return (
-    <header className="site-header">
-      <a className="brand" href="#top" aria-label="Mechmark home" onClick={close}>
-        <img src={mechmarkLogo} alt="Mechmark" />
-      </a>
-      <nav className="nav-links" aria-label="Primary navigation">
-        {navItems.map(([href, label]) => (
-          <a href={href} key={href}>
-            {label}
-          </a>
-        ))}
-      </nav>
-      <div className="header-actions">
-        <a className="header-call" href={`tel:${company.phones[0].tel}`}>
-          Call {company.phones[0].label}
+    <>
+      <header className="site-header">
+        <a className="brand" href="#top" aria-label="Mechmark home" onClick={close}>
+          <img src={mechmarkLogo} alt="Mechmark" />
         </a>
-        <a className="header-cta" href={company.whatsapp}>
-          WhatsApp
-        </a>
-        <button
-          type="button"
-          className={`menu-toggle${menuOpen ? " is-open" : ""}`}
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={menuOpen}
-          aria-controls="mobile-menu"
-          onClick={() => setMenuOpen((open) => !open)}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-      </div>
+        <nav className="nav-links" aria-label="Primary navigation">
+          {navItems.map(([href, label]) => (
+            <a href={href} key={href}>
+              {label}
+            </a>
+          ))}
+        </nav>
+        <div className="header-actions">
+          {mainPhone && (
+            <a className="header-call" href={`tel:${mainPhone.tel}`}>
+              Call {mainPhone.label}
+            </a>
+          )}
+          {company.whatsapp && (
+            <a className="header-cta" href={company.whatsapp}>
+              WhatsApp
+            </a>
+          )}
+          <button
+            type="button"
+            className={`menu-toggle${menuOpen ? " is-open" : ""}`}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
+      </header>
 
+      {/* Outside <header>: its backdrop-filter would otherwise trap this fixed panel. */}
       <nav
         id="mobile-menu"
         className={`mobile-menu${menuOpen ? " is-open" : ""}`}
@@ -165,7 +185,7 @@ function Header() {
           ))}
         </div>
       </nav>
-    </header>
+    </>
   );
 }
 
@@ -179,41 +199,84 @@ function HomeIcon() {
   );
 }
 
+function prefersReducedMotion() {
+  return typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+}
+
+function HeroStage({ hero }) {
+  if (hero.animation) {
+    const reduced = prefersReducedMotion();
+    return (
+      <div className="hero-stage hero-stage-media">
+        <video
+          src={hero.animation}
+          poster={hero.image || undefined}
+          autoPlay={!reduced}
+          controls={reduced}
+          muted
+          playsInline
+          preload="auto"
+          aria-label="Mechmark opening animation"
+        />
+      </div>
+    );
+  }
+  if (hero.image) {
+    return (
+      <div className="hero-stage hero-stage-media">
+        <img src={hero.image} alt="Mechmark machinery" />
+      </div>
+    );
+  }
+  return (
+    <div className="hero-stage" aria-label="Opening animation placeholder">
+      <div className="hero-placeholder-label">
+        <span>Opening animation</span>
+        <strong>Coming soon</strong>
+        <p>The final animation will appear here.</p>
+      </div>
+    </div>
+  );
+}
+
 function OpeningHero() {
+  const { hero } = useContent();
   return (
     <section className="hero-section" id="top">
-      {/* Animation slot: replace .hero-stage contents with the opening animation when ready. */}
-      <div className="hero-stage" aria-label="Opening animation placeholder">
-        <div className="hero-placeholder-label">
-          <span>Opening animation</span>
-          <strong>Coming soon</strong>
-          <p>The final animation will appear here.</p>
-        </div>
-      </div>
+      <HeroStage hero={hero} />
       <div className="hero-intro">
         <h1>{hero.title}</h1>
-        <p>{hero.text}</p>
-        <div className="hero-actions">
-          {hero.quickLinks.map((link) => (
-            <a className="btn btn-primary" href={link.href} key={link.label}>
-              {link.label}
-            </a>
-          ))}
-        </div>
+        {hero.text && <p>{hero.text}</p>}
+        {hero.quickLinks?.length > 0 && (
+          <div className="hero-actions">
+            {hero.quickLinks.map((link) => (
+              <a className="btn btn-primary" href={link.href} key={link.label}>
+                {link.label}
+              </a>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
 function FeaturedStory() {
+  const { featured } = useContent();
+  if (!featured) return null;
+  const external = isExternal(featured.href);
   return (
     <section className="section split-feature">
-      <MediaPlaceholder className="feature-media" label="Article image coming soon" />
+      <Media className="feature-media" src={featured.image} alt={featured.title} label="Article image coming soon" />
       <div className="split-feature-copy">
         <p className="eyebrow">{featured.eyebrow}</p>
         <h2>{featured.title}</h2>
         <p>{featured.text}</p>
-        <a className="btn btn-primary" href={featured.href} target="_blank" rel="noreferrer">
+        <a
+          className="btn btn-primary"
+          href={featured.href}
+          {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
+        >
           {featured.cta}
         </a>
       </div>
@@ -222,13 +285,14 @@ function FeaturedStory() {
 }
 
 function ProductGrid() {
+  const { productFamilies } = useContent();
   return (
     <section className="section" id="products">
       <h2 className="section-title">Select your product</h2>
       <div className="product-icon-grid">
         {productFamilies.map((product) => (
           <a className="product-icon-card" href={`#${product.slug}`} key={product.slug}>
-            {productIcons[product.icon]}
+            {productIcons[product.icon] || genericIcon}
             <span>{product.title}</span>
           </a>
         ))}
@@ -238,6 +302,7 @@ function ProductGrid() {
 }
 
 function ProductDetail({ product }) {
+  const features = product.features?.length ? product.features.slice(0, 4) : ["Specifications coming soon"];
   return (
     <section className="product-detail-page">
       <nav className="product-breadcrumb" aria-label="Breadcrumb">
@@ -252,7 +317,7 @@ function ProductDetail({ product }) {
 
       <div className="product-detail-hero">
         <div className="product-detail-copy">
-          <p className="eyebrow">{product.code}</p>
+          {product.code && <p className="eyebrow">{product.code}</p>}
           <h1>{product.title}</h1>
           {product.detail || product.summary ? (
             <>
@@ -273,7 +338,7 @@ function ProductDetail({ product }) {
       </div>
 
       <div className="product-detail-specs" aria-label={`${product.title} highlights`}>
-        {(product.features?.length ? product.features : ["Specifications coming soon"]).map((feature) => (
+        {features.map((feature) => (
           <span key={feature}>{feature}</span>
         ))}
         <div className="product-detail-actions">
@@ -281,29 +346,57 @@ function ProductDetail({ product }) {
           <a className="btn btn-secondary" href="#products">View all products</a>
         </div>
       </div>
+
+      {product.models?.length > 0 && (
+        <div className="model-section">
+          <h2 className="section-title">Available models</h2>
+          <div className="model-grid">
+            {product.models.map((model) => (
+              <article className="model-card" key={model.slug}>
+                <Media className="model-media" src={model.image} alt={model.modelCode || model.name} />
+                <div className="model-body">
+                  {model.modelCode && <p className="eyebrow">{model.modelCode}</p>}
+                  <h3>{model.name}</h3>
+                  {model.summary && <p>{model.summary}</p>}
+                  {model.specs?.length > 0 && (
+                    <ul>
+                      {model.specs.map((spec) => (
+                        <li key={spec}>{spec}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
 
 function AboutBlock() {
+  const { about } = useContent();
   return (
     <section className="section split-feature split-feature-reverse" id="about">
       <div className="split-feature-copy">
         <p className="eyebrow">{about.eyebrow}</p>
         <h2>{about.title}</h2>
         {about.paragraphs.map((text) => (
-          <p key={text.slice(0, 24)}>{text}</p>
+          <p key={text.slice(0, 32)}>{text}</p>
         ))}
         <a className="btn btn-primary" href={about.cta.href}>
           {about.cta.label}
         </a>
       </div>
-      <MediaPlaceholder className="feature-media" label="Factory image coming soon" />
+      <Media className="feature-media" src={about.image} alt="Mechmark factory" label="Factory image coming soon" />
     </section>
   );
 }
 
 function StatsStrip() {
+  const { stats } = useContent();
+  if (!stats.length) return null;
   return (
     <section className="stats-strip" aria-label="Mechmark in numbers">
       {stats.map(([value, label]) => (
@@ -328,6 +421,8 @@ function initials(name) {
 }
 
 function TeamSection() {
+  const { teamMembers } = useContent();
+  if (!teamMembers.length) return null;
   return (
     <section className="section" id="team">
       <h2 className="section-title">Meet the Mechmark team</h2>
@@ -347,6 +442,7 @@ function TeamSection() {
 }
 
 function Catalogues() {
+  const { brochures, catalogueImage } = useContent();
   return (
     <section className="section split-feature" id="catalogues">
       <div className="split-feature-copy">
@@ -362,12 +458,13 @@ function Catalogues() {
           ))}
         </div>
       </div>
-      <MediaPlaceholder className="feature-media" label="Video coming soon" />
+      <Media className="feature-media" src={catalogueImage} alt="Mechmark machinery" label="Video coming soon" />
     </section>
   );
 }
 
 function Services() {
+  const { services } = useContent();
   const trackRef = useRef(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -383,7 +480,7 @@ function Services() {
     updateEdges();
     window.addEventListener("resize", updateEdges);
     return () => window.removeEventListener("resize", updateEdges);
-  }, []);
+  }, [services.length]);
 
   const step = (direction) => {
     const el = trackRef.current;
@@ -399,7 +496,7 @@ function Services() {
       <div className="service-track" ref={trackRef} onScroll={updateEdges}>
         {services.map((service) => (
           <article className="service-card" key={service.title}>
-            <MediaPlaceholder className="service-media" />
+            <Media className="service-media" src={service.image} alt={service.title} />
             <h3>{service.title}</h3>
             <p>{service.text}</p>
             <a className="btn btn-primary btn-small" href={service.href}>
@@ -408,26 +505,59 @@ function Services() {
           </article>
         ))}
       </div>
-      <div className="carousel-controls">
-        <button type="button" onClick={() => step(-1)} disabled={atStart}>
-          ← Previous
-        </button>
-        <button type="button" onClick={() => step(1)} disabled={atEnd}>
-          Next →
-        </button>
-      </div>
+      {!(atStart && atEnd) && (
+        <div className="carousel-controls">
+          <button type="button" onClick={() => step(-1)} disabled={atStart}>
+            ← Previous
+          </button>
+          <button type="button" onClick={() => step(1)} disabled={atEnd}>
+            Next →
+          </button>
+        </div>
+      )}
     </section>
   );
 }
 
+const EMPTY_FORM = { name: "", phone: "", email: "", productInterest: "", message: "", website: "" };
+
 function Contact() {
+  const { company, productFamilies } = useContent();
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [status, setStatus] = useState({ state: "idle", message: "", fields: [] });
+
+  const update = (event) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const missing = ["name", "phone"].filter((field) => !form[field].trim());
+    if (missing.length) {
+      setStatus({ state: "error", message: "Please fill in your name and phone number.", fields: missing });
+      return;
+    }
+    setStatus({ state: "sending", message: "", fields: [] });
+    try {
+      await submitEnquiry(form);
+      setForm(EMPTY_FORM);
+      setStatus({ state: "sent", message: "Thank you! Our team will contact you shortly.", fields: [] });
+    } catch (error) {
+      setStatus({ state: "error", message: error.message, fields: error.fields || [] });
+    }
+  };
+
+  const invalid = (field) => status.fields.includes(field);
+  const mainPhone = company.phones[0];
+
   return (
     <section className="contact-section" id="contact">
       <div>
         <p className="eyebrow">Contact</p>
         <h2>Get in touch with Mechmark</h2>
-        <p>For enquiries, partnerships or support, reach out to us. We are here to help with all your food processing machinery needs.</p>
-        <p>{company.address}</p>
+        <p>
+          For enquiries, partnerships or support, reach out to us. We are here to help with all your food
+          processing machinery needs.
+        </p>
+        {company.address && <p>{company.address}</p>}
         <p className="contact-lines">
           {company.phones.map((phone) => (
             <a href={`tel:${phone.tel}`} key={phone.tel}>
@@ -435,29 +565,56 @@ function Contact() {
               {phone.note ? ` (${phone.note})` : ""}
             </a>
           ))}
-          <a href={`mailto:${company.email}`}>{company.email}</a>
+          {company.email && <a href={`mailto:${company.email}`}>{company.email}</a>}
         </p>
       </div>
-      <form className="enquiry-form">
-        <input name="name" placeholder="Name" />
-        <input name="phone" placeholder="Phone" />
-        <input name="email" placeholder="Email" />
-        <select name="product" defaultValue="">
-          <option value="" disabled>
-            Product interest
-          </option>
+      <form className="enquiry-form" onSubmit={handleSubmit} noValidate>
+        <input name="name" placeholder="Name *" value={form.name} onChange={update} aria-invalid={invalid("name")} autoComplete="name" />
+        <input name="phone" placeholder="Phone *" value={form.phone} onChange={update} aria-invalid={invalid("phone")} type="tel" autoComplete="tel" />
+        <input name="email" placeholder="Email" value={form.email} onChange={update} type="email" autoComplete="email" />
+        <select name="productInterest" value={form.productInterest} onChange={update}>
+          <option value="">Product interest</option>
           {productFamilies.map((product) => (
             <option key={product.slug}>{product.title}</option>
           ))}
         </select>
-        <textarea name="message" placeholder="Requirement" rows="4" />
-        <button type="button">Submit enquiry</button>
+        <textarea name="message" placeholder="Requirement" rows="4" value={form.message} onChange={update} />
+        {/* Honeypot: hidden from people, bots fill it in. */}
+        <input className="hp-field" name="website" value={form.website} onChange={update} tabIndex={-1} autoComplete="off" aria-hidden="true" />
+        <button type="submit" disabled={status.state === "sending"}>
+          {status.state === "sending" ? "Sending..." : "Submit enquiry"}
+        </button>
+        {status.message && (
+          <p className={`form-status form-status-${status.state}`} role="status">
+            {status.message}
+            {status.state === "error" && mainPhone && (
+              <>
+                {" "}
+                You can also call <a href={`tel:${mainPhone.tel}`}>{mainPhone.label}</a>
+                {company.whatsapp && (
+                  <>
+                    {" "}or <a href={company.whatsapp}>WhatsApp us</a>
+                  </>
+                )}
+                .
+              </>
+            )}
+          </p>
+        )}
       </form>
     </section>
   );
 }
 
 function Footer() {
+  const { company, productFamilies, brochures } = useContent();
+  const social = [
+    ["Facebook", company.social?.facebook],
+    ["Instagram", company.social?.instagram],
+    ["YouTube", company.social?.youtube]
+  ].filter(([, url]) => url);
+  const mainPhone = company.phones[0];
+
   return (
     <footer className="site-footer">
       <div className="footer-columns">
@@ -488,50 +645,64 @@ function Footer() {
           <a href="#about">About us</a>
           <a href="#team">Our team</a>
           <a href="#contact">Contact us</a>
-          <a href={company.whatsapp}>WhatsApp</a>
+          {company.whatsapp && <a href={company.whatsapp}>WhatsApp</a>}
         </div>
         <div className="footer-contact">
           <h4>Contact</h4>
-          <p>{company.address}</p>
+          {company.address && <p>{company.address}</p>}
           {company.phones.map((phone) => (
             <a href={`tel:${phone.tel}`} key={phone.tel}>
               {phone.label}
             </a>
           ))}
-          <a href={`mailto:${company.email}`}>{company.email}</a>
+          {company.email && <a href={`mailto:${company.email}`}>{company.email}</a>}
         </div>
       </div>
       <div className="footer-social">
-        <a href={company.social.facebook} target="_blank" rel="noreferrer">Facebook</a>
-        <a href={company.social.instagram} target="_blank" rel="noreferrer">Instagram</a>
-        <strong>Call us: {company.phones[0].label}</strong>
+        {social.map(([label, url]) => (
+          <a href={url} key={label} target="_blank" rel="noreferrer">
+            {label}
+          </a>
+        ))}
+        {mainPhone && <strong>Call us: {mainPhone.label}</strong>}
       </div>
       <div className="footer-bottom">
         <a className="brand brand-small" href="#top" aria-label="Mechmark home">
           <img src={mechmarkLogo} alt="Mechmark" />
         </a>
-        <span>© {new Date().getFullYear()} {company.name}. All rights reserved.</span>
+        <span>
+          © {new Date().getFullYear()} {company.name}. All rights reserved.
+        </span>
       </div>
     </footer>
   );
 }
 
-function getSelectedProduct() {
-  const hash = window.location.hash.replace("#", "");
-  return productFamilies.find((product) => product.slug === hash) || null;
-}
-
-export default function App() {
-  const [selectedProduct, setSelectedProduct] = useState(getSelectedProduct);
+function useHashProduct(productFamilies) {
+  const read = () => {
+    const hash = window.location.hash.replace("#", "");
+    return productFamilies.find((product) => product.slug === hash) || null;
+  };
+  const [selected, setSelected] = useState(read);
 
   useEffect(() => {
-    const handleHashChange = () => setSelectedProduct(getSelectedProduct());
+    setSelected(read()); // content may arrive from the API after first render
+    const handleHashChange = () => setSelected(read());
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productFamilies]);
+
+  return selected;
+}
+
+function Site() {
+  const { productFamilies } = useContent();
+  const selectedProduct = useHashProduct(productFamilies);
+  const selectedSlug = selectedProduct?.slug;
 
   useEffect(() => {
-    if (selectedProduct) {
+    if (selectedSlug) {
       window.scrollTo({ top: 0, behavior: "auto" });
     } else {
       // Returning from a product page to a homepage anchor: scroll to that section.
@@ -539,7 +710,7 @@ export default function App() {
       const target = id && document.getElementById(id);
       if (target) target.scrollIntoView();
     }
-  }, [selectedProduct]);
+  }, [selectedSlug]);
 
   return (
     <>
@@ -563,5 +734,13 @@ export default function App() {
       </main>
       <Footer />
     </>
+  );
+}
+
+export default function App() {
+  return (
+    <ContentProvider>
+      <Site />
+    </ContentProvider>
   );
 }

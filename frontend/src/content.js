@@ -1,6 +1,7 @@
-// Site content for the Mechmark homepage.
-// Everything here is designed to move into the Django admin later (see admin-panel task).
-// Fields set to null render a "coming soon" placeholder until real content is uploaded.
+// Fallback content for the Mechmark homepage.
+// The live site loads the same shape from the Django API (/api/site/), which the client edits in /admin/.
+// This file is only used if the API can't be reached, so the site never shows a blank page.
+// Fields set to null render a "coming soon" placeholder.
 
 import multiPurposePdf from "../../assets/brochures/Multi Purpose Dehydrate Systems.pdf";
 import firewoodPdf from "../../assets/brochures/firewood tray type copra Dryer.pdf";
@@ -30,6 +31,8 @@ export const company = {
 export const hero = {
   title: "Food Processing Machinery, Built in Kerala",
   text: "Dryers, oil processing units and coconut cutting machines - manufactured in our own factory and supported across India.",
+  animation: null, // uploaded via admin -> Site settings -> Opening animation
+  image: null,
   quickLinks: [
     { label: "Dryers", href: "#dryers" },
     { label: "Oil Press", href: "#mco3-oil-press" },
@@ -41,6 +44,7 @@ export const featured = {
   eyebrow: "From the Mechmark blog",
   title: "Coconut Oil Production: Start a Profitable Business with a Small Budget",
   text: "Coconut oil is a versatile, high-demand product used in cooking, cosmetics and wellness. Here is how a compact Mechmark oil processing setup can get a small unit running.",
+  image: null,
   href: "https://mechmark.in/Start-a-Profitable-Business-with-a-Small-Budget.html",
   cta: "Read more"
 };
@@ -52,6 +56,7 @@ export const productFamilies = [
     icon: "dryer",
     slug: "dryers",
     image: null,
+    models: [],
     summary:
       "Electric, trayless and firewood tray-type dryers for copra, spices, fruits and other food products.",
     detail:
@@ -69,6 +74,7 @@ export const productFamilies = [
     icon: "copraCutter",
     slug: "copra-cutter",
     image: null,
+    models: [],
     summary: "Heavy-duty coconut/copra cutting machine with hopper, belt drive, and rigid frame.",
     detail:
       "A sturdy copra cutting machine designed for coconut processing units that need consistent cutting, easy loading, and dependable daily operation.",
@@ -80,6 +86,7 @@ export const productFamilies = [
     icon: "oilPress",
     slug: "mco3-oil-press",
     image: null,
+    models: [],
     summary: "Compact stainless oil processing unit with feed hopper, press chamber, and control panel.",
     detail:
       "A compact stainless oil processing unit built for controlled pressing, clean product flow, and straightforward operation in small commercial spaces.",
@@ -91,6 +98,7 @@ export const productFamilies = [
     icon: "filterPress",
     slug: "filter-press-10-10",
     image: null,
+    models: [],
     summary: "Manual filter press with plate stack, hand wheel, stainless tray, and collection tank.",
     detail:
       "A manual filter press for oil filtration workflows, with a clear plate stack layout, collection tray, hand wheel, and stainless collection tank.",
@@ -102,6 +110,7 @@ export const productFamilies = [
     icon: "storageTank",
     slug: "storage-tank",
     image: null,
+    models: [],
     summary: "Stainless storage tank with tall stand, tapered base, and multiple outlet taps.",
     detail:
       "A stainless storage tank made for clean holding and controlled outlet flow, supported by a tall stand and tapered bottom section.",
@@ -116,6 +125,7 @@ export const about = {
     "Mechmark Industries, established in 2010, manufactures food processing machinery from its own factory at Puthoor, Kozhikode - about 30 km from Calicut city.",
     "Our dryers, oil processing units and coconut cutting machines help food producers work faster and more hygienically while preserving the nutritional value of what they make. We provide genuine service across India and partially worldwide."
   ],
+  image: null,
   cta: { label: "Talk to our team", href: "#contact" }
 };
 
@@ -138,24 +148,28 @@ export const services = [
   {
     title: "Machine selection guidance",
     text: "Not sure which dryer or oil unit fits your output? Our team helps you choose the right capacity for your business.",
+    image: null,
     href: "#contact",
     cta: "Ask an expert"
   },
   {
     title: "Installation & operator support",
     text: "We install your machine on site and train your operators so production starts smoothly from day one.",
+    image: null,
     href: "#contact",
     cta: "Learn more"
   },
   {
     title: "Genuine spare parts",
     text: "Original Mechmark parts for a longer and stronger machine life, supplied directly from our factory.",
+    image: null,
     href: "#contact",
     cta: "Request parts"
   },
   {
     title: "Pan-India service",
     text: "Service support across India and partially worldwide, so your production keeps running with minimal downtime.",
+    image: null,
     href: "#contact",
     cta: "Book service"
   }
@@ -168,3 +182,18 @@ export const teamMembers = [
   { name: "Anshad Mohd", role: "Operations", image: null },
   { name: "Shreyas KS", role: "Marketing Manager", image: null }
 ];
+
+export const catalogueImage = null;
+
+export const fallbackContent = {
+  company,
+  hero,
+  featured,
+  productFamilies,
+  about,
+  stats,
+  brochures,
+  catalogueImage,
+  services,
+  teamMembers
+};

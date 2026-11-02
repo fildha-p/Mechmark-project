@@ -404,6 +404,38 @@ body.menu-open {
   gap: 12px;
 }
 
+/* Uploaded media (replaces placeholders when present) */
+.media-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+
+.split-feature .media-image,
+.service-card .media-image,
+.model-card .media-image {
+  aspect-ratio: 16 / 9;
+}
+
+.service-card .media-image {
+  margin-bottom: 18px;
+}
+
+.hero-stage-media {
+  background: #111;
+}
+
+.hero-stage-media video,
+.hero-stage-media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* ---------- Generic sections ---------- */
 
 .section {
@@ -762,6 +794,40 @@ body.menu-open {
   background: var(--brand-hover);
 }
 
+.enquiry-form [aria-invalid="true"] {
+  border-color: #ff6b5a;
+}
+
+.enquiry-form button:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.hp-field {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.form-status {
+  margin: 0;
+  padding: 12px 14px;
+  border-left: 4px solid var(--brand);
+  background: var(--panel);
+  color: var(--text);
+}
+
+.form-status-error {
+  border-left-color: #ff6b5a;
+}
+
+.form-status a {
+  color: var(--brand);
+  text-decoration: underline;
+}
+
 /* ---------- Footer ---------- */
 
 .site-footer {
@@ -932,6 +998,53 @@ body.menu-open {
   align-items: center;
   gap: 10px;
   padding: 12px;
+}
+
+/* Models list on a product page */
+.model-section {
+  margin-top: clamp(36px, 5vw, 56px);
+}
+
+.model-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  padding-top: 24px;
+}
+
+.model-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+
+.model-card .model-media {
+  aspect-ratio: 16 / 9;
+  min-height: 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.model-body {
+  padding: 18px;
+}
+
+.model-body .eyebrow {
+  margin-bottom: 6px;
+}
+
+.model-body h3 {
+  font-size: 22px;
+}
+
+.model-body p {
+  margin-bottom: 8px;
+  color: var(--muted);
+}
+
+.model-body ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
 }
 
 /* ---------- Responsive ---------- */
